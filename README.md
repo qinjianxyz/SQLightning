@@ -10,27 +10,28 @@ quit;
 CREATE DATABASE test1;<br>
 USE test1;<br>
 CREATE TABLE Users ( id int NOT NULL auto_increment primary key, first_name varchar(50) NOT NULL, last_name varchar(50), age int, zipcode int);<br>
-create table Books ( id int NOT NULL auto_increment primary key, title varchar(25) NOT NULL, subtitle varchar(25), user_id int);
+create table Books ( id int NOT NULL auto_increment primary key, title varchar(25) NOT NULL, subtitle varchar(25), user_id int);<br>
 DESCRIBE Users;<br>
 DESCRIBE Books;<br>
 INSERT INTO Users (first_name, last_name, age, zipcode) VALUES ("Terry",     "Pratchett", 70,  92124), ("Ian",       "Tregellis", 48,  92123), ("Jody",      "Taylor",    50,  92120), ("Stephen",   "King",      74,  92125), ("Ted",       "Chiang",    56,  92120), ("Anthony",   "Doerr",     52,  92122), ("J.R.R.",    "Tolkien",   130, 92126), ("Aurthur C.","Clarke",    105, 92127), ("Seldon",    "Edwards",   81,  92128), ("Neal",      "Stephenson",62,  92121);<br>
-INSERT INTO Books (title, user_id) VALUES ("The Green Mile",4), ("The Stand",4), ("Misery",4), ("11/22/63",4), ("The Institute",4), ("Sorcerer",1), ("Wintersmith",1), ("Mort",1), ("Thud",1), ("Time Police",3), ("The Mechanical",2), ("The Liberation",2), ("The Rising",2), ("Exhalation",5);
+INSERT INTO Books (title, user_id) VALUES ("The Green Mile",4), ("The Stand",4), ("Misery",4), ("11/22/63",4), ("The Institute",4), ("Sorcerer",1), ("Wintersmith",1), ("Mort",1), ("Thud",1), ("Time Police",3), ("The Mechanical",2), ("The Liberation",2), ("The Rising",2), ("Exhalation",5);<br>
 SELECT * from Users;<br>
 SELECT * from Users  limit 3 where zipcode>92122 order by zipcode;<br>
-select * from Users order by last_name;
-select * from Books order by title;
-SELECT * from Users where age>20 AND zipcode=92100 ORDER BY last_name;
+select * from Users order by last_name;<br>
+select * from Books order by title;<br>
+SELECT * from Users where age>20 AND zipcode=92100 ORDER BY last_name;<br>
 select first_name, last_name, age from Users order by last_name where age>60;<br>
-UPDATE Users SET "zipcode" = 92127 WHERE zipcode>92100;
-DELETE FROM Users WHERE zipcode>92000;
-DROP TABLE Users;
+UPDATE Users SET "zipcode" = 92127 WHERE zipcode>92100;<br>
+DELETE FROM Users WHERE zipcode>92000;<br>
+DROP TABLE Users;<br>
 SHOW TABLES;<br>
 SHOW DATABASES;<br>
 DROP DATABASE test1;<br>
-SHOW INDEXES;
-SHOW INDEX id FROM Users;
-select last_name, title from Authors left join Books on Authors.id=Books.author_id;
-select last_name, title from Authors right join Books on Authors.id=Books.author_id;
+DUMP DATABASE test1;<br>
+SHOW INDEXES;<br>
+SHOW INDEX id FROM Users;<br>
+select last_name, title from Authors left join Books on Authors.id=Books.author_id;<br>
+select last_name, title from Authors right join Books on Authors.id=Books.author_id;<br>
 
 
 ## Week 1 Update
