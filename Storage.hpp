@@ -36,6 +36,7 @@ using BlockVisitor = std::function<bool(const Block&, size_t)>;
  The controller for storage related operation
  */
 class Storage : public BlockIO {
+    LRUCache<size_t, Row> rowCache;
 public:
     Storage(std::string aPath);
     ~Storage();
@@ -46,11 +47,11 @@ public:
     StatusResult        updateEntity(const Entity &anEntity, const size_t aBlockNumber);
     StatusResult        readRow(const size_t aBlockNum, Row& aRow);
     StatusResult        readRowName(const size_t aBlockNum, std::string& aString);
-    size_t              writeNewRow(const Row& aRow);
+    StatusResult        clearRow(const size_t aBlockNum);
+    size_t              writeNewRow(Row& aRow);
     StatusResult        writeExistingRow(const Row& aRow);
     StatusResult        pushPayload(Block& theBlock, const Storable& theStorable);
     std::stringstream   pullPayload(Block& theBlock);
-    StatusResult        clearBlock(const size_t aBlockNum);
 };
 }
 

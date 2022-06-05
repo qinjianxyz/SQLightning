@@ -61,7 +61,7 @@ public:
                 return StatusResult{};
             }
         }
-        return StatusResult{ databaseRemovalError };
+        return StatusResult{};
     }
     
     std::map<std::string, int>& getData() {

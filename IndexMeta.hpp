@@ -13,7 +13,7 @@
 #include "TypedStream.hpp"
 
 namespace ECE141 {
-    using FieldIndexMap = std::map<std::string, int>;
+    using FieldIndexMap = std::map<std::string, std::vector<int>>;
     using TableIndexMap = std::map<std::string, FieldIndexMap>;
 
     class IndexMeta : public Storable  {
@@ -27,11 +27,11 @@ namespace ECE141 {
         StatusResult encode(std::ostream& anOutput) const override;
         StatusResult decode(std::istream& anInput) override;
         StatusResult addNewFieldIndex(const std::string aTableName, const std::string aFieldName, const int aBlockNumber);
-        StatusResult updateFieldIndex(const std::string aTableName, const std::string aFieldName, const int aBlockNumber);
+        StatusResult addNewFieldIndexVector(const std::string aTableName, const std::string aFieldName, const std::vector<int> aBlockVector);
+        // StatusResult updateFieldIndex(const std::string aTableName, const std::string aFieldName, const int aBlockNumber);
         StatusResult deleteFieldIndex(const std::string aTableName, const std::string aFieldName);
         StatusResult deleteTableIndex(const std::string aTableName);
-        StatusResult getFieldIndex(const std::string aTableName, const std::string aFieldName, int& aBlockNumber);
-
+        StatusResult getFieldIndex(const std::string aTableName, const std::string aFieldName, std::vector<int>& aBlockVector);
         StatusResult isContainTable(const std::string aTableName);
         StatusResult isContainField(const std::string aTableName, const std::string aFieldName);
 

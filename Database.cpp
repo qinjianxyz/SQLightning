@@ -24,54 +24,65 @@ Database::~Database() {
 
 StatusResult Database::storeIndex(const std::string& aTableName, const std::string& aFieldName, const std::string& aKey, const int& aBlockNumber) {
     StatusResult theRes;
-    int theIndexBlockNumber;
     Block theBlock(BlockType::index_block);
     Index theIndex;
-    
     // if the index has not been created
     if (!theIndexMeta->isContainField(aTableName, aFieldName)) {
-        theIndexBlockNumber = static_cast<int>(findNextFreeBlock());
+        int theIndexBlockNumber = static_cast<int>(findNextFreeBlock());
         theRes = theIndexMeta->addNewFieldIndex(aTableName, aFieldName, static_cast<int>(theIndexBlockNumber));
         if (!theRes) return theRes;
         
-        
         theIndex.set(aKey, aBlockNumber);
-        std::stringstream ss;
-        theRes = theIndex.encode(ss);
+        theRes = pushPayload(theBlock, theIndex);
         if (!theRes) return theRes;
-        
-        memcpy(theBlock.payload, ss.str().c_str(), kPayloadSize);
         theRes = writeBlock(theIndexBlockNumber, theBlock);
         return theRes;
     }
     
     // read the block first
-    theIndexMeta->getFieldIndex(aTableName, aFieldName, theIndexBlockNumber);
-    theRes = readBlock(theIndexBlockNumber, theBlock);
+    std::vector<int> theIndexBlockVector;
+    theIndexMeta->getFieldIndex(aTableName, aFieldName, theIndexBlockVector);
+    int theLastIndex = theIndexBlockVector[theIndexBlockVector.size()-1];
+    theRes = readBlock(theLastIndex, theBlock);
     if (!theRes) return theRes;
     
     // read the index object
-    std::stringstream ss;
-    ss << theBlock.payload;
+    std::stringstream ss = pullPayload(theBlock);
     if (ss.str() != "") {
         theRes = theIndex.decode(ss);
+        if (!theRes) return theRes;
     }
-    if (!theRes) return theRes;
     
-    // set the value in map
-    theIndex.set(aKey, aBlockNumber);
-    std::stringstream sss;
-    theRes = theIndex.encode(sss);
-    if (!theRes) return theRes;
-    memcpy(theBlock.payload, sss.str().c_str(), kPayloadSize);
-    theRes = writeBlock(theIndexBlockNumber, theBlock);
+    /**
+     New concept: limit by index size
+     */
+    int theIndexLimit = kBlockSize / 30;
+    
+    // within space limit
+    if (theIndex.size() < theIndexLimit) {
+        // set the value in map
+        theIndex.set(aKey, aBlockNumber);
+        theRes = pushPayload(theBlock, theIndex);
+        if (!theRes) return theRes;
+        theRes = writeBlock(theLastIndex, theBlock);
+    } else {
+        // write a new block
+        Index theNewIndex;
+        int theNextIndexBlockNumber = static_cast<int>(findNextFreeBlock());
+        theNewIndex.set(aKey, aBlockNumber);
+        theRes = pushPayload(theBlock, theNewIndex);
+        if (!theRes) return theRes;
+        theRes = writeBlock(theNextIndexBlockNumber, theBlock);
+        if (!theRes) return theRes;
+        theRes = theIndexMeta->addNewFieldIndex(aTableName, aFieldName, static_cast<int>(theNextIndexBlockNumber));
+    }
     return theRes;
 }
 
 StatusResult Database::readIndexMeta() {
     StatusResult theRes;
-    Block theBlock;
-    theRes = readBlock(1, theBlock);
+    IndexMetaBlock theBlock;
+    theRes = readIndexMetaBlock(theBlock);
     if (theBlock.header.type != static_cast<char>(BlockType::meta_block)) {
         theRes = StatusResult{unknownType};
     }
@@ -89,11 +100,13 @@ StatusResult Database::writeIndexMeta() {
     StatusResult theRes;
     std::stringstream ss;
     theIndexMeta->encode(ss);
-    Block theBlock(BlockType::meta_block);
-    memcpy(theBlock.payload, ss.str().c_str(), kPayloadSize);
-    theRes = writeBlock(1, theBlock);
+    IndexMetaBlock theBlock(BlockType::meta_block);
+    memcpy(theBlock.payload, ss.str().c_str(), kIndexMetaPayloadSize);
+    theRes = writeIndexMetaBlock(theBlock);
     return theRes;
 }
+
+
 
 StatusResult Database::selectRowsByBruteForce(const Query& aQuery, RowCollection& rows) {
     std::string theTableName = aQuery.tableName;
@@ -119,21 +132,23 @@ StatusResult Database::selectRowsByIndex(const Query& aQuery, RowCollection& row
     if (!tableExists(theTableName)) {
         return StatusResult{ unknownTable };
     }
-    int theIndexBlockNumber;
-    theRes = theIndexMeta->getFieldIndex(theTableName, aFieldName, theIndexBlockNumber);
+    std::vector<int> theIndexBlockVector;
+    theRes = theIndexMeta->getFieldIndex(theTableName, aFieldName, theIndexBlockVector);
     if (!theRes) return StatusResult{};
     
-    Block theBlock;
-    Index theIndex;
-    theRes = readBlock(theIndexBlockNumber, theBlock);
-    if (!theRes) return theRes;
-    std::stringstream ss = pullPayload(theBlock);
-    theIndex.decode(ss);
-    for (auto it = theIndex.getData().begin(); it != theIndex.getData().end(); it++) {
-        std::shared_ptr<Row> theRow = std::make_shared<Row>();
-        theRes = readRow(it->second, *theRow);
+    for (auto& index : theIndexBlockVector) {
+        Block theBlock;
+        Index theIndex;
+        theRes = readBlock(index, theBlock);
         if (!theRes) return theRes;
-        rows.push_back(theRow);
+        std::stringstream ss = pullPayload(theBlock);
+        theIndex.decode(ss);
+        for (auto it = theIndex.getData().begin(); it != theIndex.getData().end(); it++) {
+            std::shared_ptr<Row> theRow = std::make_shared<Row>();
+            theRes = readRow(it->second, *theRow);
+            if (!theRes) return theRes;
+            rows.push_back(theRow);
+        }
     }
     return theRes;
 }
@@ -202,26 +217,31 @@ StatusResult Database::deleteRows(const Query& aQuery) {
     if (!theRes) return theRes;
     
     // update index
-    Block theBlock;
-    Index theIndex;
-    int theIndexBlockNumber;
-    theIndexMeta->getFieldIndex(theTableName, "id", theIndexBlockNumber);
-    theRes = readBlock(theIndexBlockNumber, theBlock);
-    if (!theRes) return theRes;
-    std::stringstream ss = pullPayload(theBlock);
-    theIndex.decode(ss);
-    for (auto& row: theRows) {
-        theIndex.del(row->getNum());
+    std::vector<int> theIndexBlockVector;
+    theIndexMeta->getFieldIndex(theTableName, "id", theIndexBlockVector);
+    
+    for (auto& index : theIndexBlockVector) {
+        Block theBlock;
+        Index theIndex;
+        theRes = readBlock(index, theBlock);
+        if (!theRes) return theRes;
+        
+        std::stringstream ss = pullPayload(theBlock);
+        theIndex.decode(ss);
+        
+        for (auto& row: theRows) {
+            theIndex.del(row->getNum());
+        }
+        theRes = pushPayload(theBlock, theIndex);
+        if (!theRes) return theRes;
+        theRes = writeBlock(index, theBlock);
+        if (!theRes) return theRes;
     }
-    theIndex.decode(ss);
-    theRes = pushPayload(theBlock, theIndex);
-    if (!theRes) return theRes;
-    theRes = writeBlock(theIndexBlockNumber, theBlock);
-    if (!theRes) return theRes;
+    
     
     // clearBlock
     for (auto& row: theRows) {
-        clearBlock(row->getNum());
+        clearRow(row->getNum());
     }
     
     theSuccessFlag = true;
@@ -328,14 +348,15 @@ StatusResult Database::showQuery(const Query& aQuery) {
     theRes = limitRows(aQuery, theRows);
     if (!theRes) return theRes;
     
+    // command view
+    theSuccessFlag = true;
+    CommandView* theView = new CommandView(output, Keywords::select_kw, theSuccessFlag, theRows.size(), theTimer.elapsed());
+    
     // show selected rows
     SelectView theSelectView(output);
     theSelectView.addData(aQuery, theRows, theEntity);
+    theSelectView.addCommand(theView);
     theSelectView.show();
-    
-    theSuccessFlag = true;
-    CommandView theView(output, Keywords::select_kw, theSuccessFlag, theRows.size(), theTimer.elapsed());
-    theView.show();
     return theRes;
 }
 
@@ -474,33 +495,47 @@ StatusResult Database::showTableIndex(const std::string& aTableName, const std::
     }
     
     // get index block number
-    int theIndexBlockNumber;
-    theRes = theIndexMeta->getFieldIndex(aTableName, theFieldName, theIndexBlockNumber);
+    std::vector<int> theIndexBlockVector;
+    theRes = theIndexMeta->getFieldIndex(aTableName, theFieldName, theIndexBlockVector);
     if (!theRes) return theRes;
     
-    // read block
-    Block theBlock;
-    theRes = readBlock(theIndexBlockNumber, theBlock);
-    if (!theRes) return theRes;
-    
-    // read the index object
-    Index theIndex;
-    std::stringstream ss;
-    ss << theBlock.payload;
-    if (ss.str() != "") {
-        theRes = theIndex.decode(ss);
-    }
-    if (!theRes) return theRes;
-    
+    // create tabular view
     TabularView theView(output);
     theView.setHeaders(std::vector<std::string>{"key", "block#"});
+    
     std::vector<std::vector<std::string>> theData;
-    for (auto it = theIndex.getData().begin(); it != theIndex.getData().end(); it++) {
-        theData.push_back(std::vector<std::string> {it->first, std::to_string(it->second)});
+    size_t theTotalSize = 0;
+    for (auto& index : theIndexBlockVector) {
+        // read block
+        Block theBlock;
+        theRes = readBlock(index, theBlock);
+        if (!theRes) return theRes;
+        
+        // read the index object
+        Index theIndex;
+        std::stringstream ss = pullPayload(theBlock);
+        theIndex.decode(ss);
+        if (!theRes) return theRes;
+        for (auto it = theIndex.getData().begin(); it != theIndex.getData().end(); it++) {
+            theData.push_back(std::vector<std::string> {it->first, std::to_string(it->second)});
+            theTotalSize++;
+        }
     }
+     
     theView.addData(theData);
     theView.show();
-    output << theIndex.size() << " rows in set (" << Config::getTimer().elapsed() <<  "secs)" << std::endl;
+     
+    
+    /*
+    RowCollection theRows;
+    Query theQuery;
+    theQuery.tableName = aTableName;
+    theQuery.columns.push_back("*");
+    theRes = selectRowsByIndex(theQuery, theRows, "id");
+     */
+    
+    if (!theRes) return theRes;
+    output << theTotalSize << " rows in set (" << Config::getTimer().elapsed() <<  "secs)" << std::endl;
     return theRes;
 }
 
@@ -582,14 +617,17 @@ StatusResult Database::dropTable(const std::string &aName) {
     Entity theEntity;
     theRes = readEntity(meta.entityList[aName], theEntity);
     std::string thePrimaryKey = theEntity.getPrimaryKey().value().getName();
-    int theIndexBlockNumber;
-    theIndexMeta->getFieldIndex(aName, thePrimaryKey, theIndexBlockNumber);
+    std::vector<int> theIndexBlockVector;
+    theIndexMeta->getFieldIndex(aName, thePrimaryKey, theIndexBlockVector);
     theIndexMeta->deleteTableIndex(aName);
-    theRes = clearBlock(theIndexBlockNumber);
-    if (!theRes) return theRes;
     
+    // clear index blocks
+    for (auto& index : theIndexBlockVector) {
+        theRes = clearBlock(index);
+        if (!theRes) return theRes;
+    }
 
-    // delete all blocks
+    // delete data blocks
     for (auto& blockNum : deleteBlockNum) {
         theRes = clearBlock(blockNum);
         if (!theRes) return theRes;

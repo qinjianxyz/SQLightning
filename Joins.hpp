@@ -17,7 +17,7 @@
 
 namespace ECE141 {
 
-class Join  {
+class Join {
 public:
     const static std::set<Keywords> gJoinTypes;
     

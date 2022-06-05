@@ -38,7 +38,7 @@ class Application : public CmdProcessor {
 public:
     Application(std::ostream &anOutput);
     virtual                 ~Application();
-    std::string             getVersion() { return "0.9";}
+    std::string             getVersion() { return "1.0";}
     CmdProcessor*           recognizes(Tokenizer &aTokenizer) override;
     Statement*              makeStatement(Tokenizer &aTokenizer, StatusResult &aResult) override;
     

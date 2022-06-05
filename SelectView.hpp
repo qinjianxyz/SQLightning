@@ -17,6 +17,7 @@ namespace ECE141
         
     public:
         SelectView(std::ostream& anOutput) : TabularView(anOutput) {}
+        
         virtual ~SelectView() {}
 
         StatusResult addData(const Query& aQuery, const RowCollection& rows, const Entity& anEntity) {

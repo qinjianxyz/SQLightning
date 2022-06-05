@@ -16,7 +16,7 @@ namespace ECE141 {
 
 class ScriptRunner {
 public:
-    ScriptRunner(Application* anApp) : app(anApp) {}
+    ScriptRunner(Application& anApp) : app(anApp) {}
     
     StatusResult run(std::istream &anInput, std::ostream &anOutput) {
         StatusResult theResult{};
@@ -25,7 +25,7 @@ public:
             std::getline (anInput, theCommand);
             std::stringstream theStream(theCommand);
             anOutput << theCommand << "\n";
-            theResult=app->handleInput(theStream);
+            theResult=app.handleInput(theStream);
             if(!theResult) {
                 //showErrors(theResult, anOutput);
             }
@@ -37,7 +37,7 @@ public:
     }
     
 protected:
-    Application* app;
+    Application& app;
 };
 
 }

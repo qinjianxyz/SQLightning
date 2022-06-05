@@ -16,6 +16,8 @@
 
 #include "Errors.hpp"
 #include "Entity.hpp"
+#include "Config.hpp"
+#include "LRUCache.hpp"
 
 namespace ECE141 {
 
@@ -56,10 +58,15 @@ struct BlockHeader {
     char      type;     // char version of block type
 };
 
-
-const size_t kBlockSize = 2048;
+/**
+ Each index meta can handle approximately 5000 blocks.
+ Ex. if you want to insert 10 million blocks, set meta size to 2000.
+ */
+const size_t metaSize = 50;
+const size_t kBlockSize = 1024;
 const size_t kPayloadSize = kBlockSize - sizeof(BlockHeader);
-
+const size_t kIndexMetaBlockSize = kBlockSize * (metaSize - 1);
+const size_t kIndexMetaPayloadSize = kIndexMetaBlockSize - sizeof(BlockHeader);
 
 /**
  The class is a polymorphic basic unit of Storage
@@ -77,6 +84,22 @@ public:
     char            payload[kPayloadSize];
 };
 
+/**
+ special block for IndexMeta
+ */
+class IndexMetaBlock {
+public:
+    IndexMetaBlock(BlockType aType = BlockType::meta_block);
+    
+    IndexMetaBlock(const Block &aCopy);
+    
+    IndexMetaBlock& operator=(const Block &aCopy);
+    
+    BlockHeader     header;
+    
+    char            payload[kIndexMetaPayloadSize];
+};
+
 // Interface to Handle Blocks
 class BlockIO {
 public:
@@ -84,11 +107,15 @@ public:
     BlockIO(std::string aPath, bool asNew);
     ~BlockIO();
     size_t                getBlockCount();
+    StatusResult          clearBlock(const size_t aBlockNum);
     StatusResult          readBlock (size_t aBlockNumber, Block &aBlock);
     StatusResult          writeBlock(size_t aBlockNumber, Block &aBlock);
+    StatusResult          readIndexMetaBlock (IndexMetaBlock &aBlock);
+    StatusResult          writeIndexMetaBlock(IndexMetaBlock &aBlock);
 protected:
-    size_t                findNextFreeBlock();
-    std::unique_ptr<std::fstream>       stream;
+    LRUCache<size_t, Block>         blockCache;
+    size_t                          findNextFreeBlock();
+    std::unique_ptr<std::fstream>   stream;
 };
 
 }

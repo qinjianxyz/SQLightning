@@ -27,6 +27,7 @@ Row& Row::operator=(const Row &aRow) {
     for (auto it = aRow.data.begin(); it != aRow.data.end(); it++) {
         set(it->first, it->second);
     }
+    rowNum = aRow.rowNum;
     tableName = aRow.tableName;
     return *this;
 }

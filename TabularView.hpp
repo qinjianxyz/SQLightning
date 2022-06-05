@@ -27,9 +27,15 @@ using TabularViewRow = std::vector<std::string>;
 class TabularView : public View {
 public:
     
-    TabularView(std::ostream& anOutput) : View(anOutput) {}
+    TabularView(std::ostream& anOutput) : View(anOutput) {
+        command = nullptr;
+    }
 
-    virtual ~TabularView() {}
+    virtual ~TabularView() {
+        if (command) {
+            delete command;
+        }
+    }
     
     // USE: create header for tablular view...
     StatusResult showHeader() {
@@ -87,6 +93,11 @@ public:
             if (!theRes) return theRes;
         }
         std::cout << "table size : " << dataRows.size() << "\n";
+        
+        // integrated command view for caching
+        if (command) {
+            command->show();
+        }
         return StatusResult{};
     }
     
@@ -99,6 +110,11 @@ public:
         dataRows = aRows;
         return StatusResult{};
     }
+    
+    StatusResult addCommand(CommandView* aCommand) {
+        command = aCommand;
+        return StatusResult{};
+    }
 
 
     
@@ -106,6 +122,7 @@ protected:
     std::vector<size_t>         widths;   //  write widths when adding value
     std::vector<std::string>    headers;
     std::vector<TabularViewRow> dataRows;
+    CommandView*                command;
     std::string columnSeparater = "|";
 
 };

@@ -78,7 +78,7 @@ StatusResult Application::runScript(std::string aFileName) {
         return theRes;
     }
     
-    ScriptRunner theRunner(this);
+    ScriptRunner theRunner(*this);
     theRunner.run(theFile, output);
     
     std::cout << aFileName << std::endl;
@@ -138,11 +138,11 @@ StatusResult Application::createDatabase(const std::string &aName) {
     theBlock.payload[0] = '\0';
     theBlockIO.writeBlock(0, theBlock);
     
-    // write index meta block
-    Block theIndexBlock(BlockType::meta_block);
-    theIndexBlock.payload[0] = '\0';
-    theBlockIO.writeBlock(1, theIndexBlock);
     
+    // write index meta block
+    IndexMetaBlock theIndexBlock(BlockType::meta_block);
+    theIndexBlock.payload[0] = '\0';
+    theBlockIO.writeIndexMetaBlock(theIndexBlock);
     CommandView theView(output, Keywords::create_kw, theSuccessFlag, theCount, theTimer.elapsed());
     theView.show();
     return StatusResult{};
@@ -190,7 +190,7 @@ StatusResult Application::dumpDatabase(const std::string &aName)  {
     size_t theCount = databaseInuse->getBlockCount();
     Block theBlock;
     char theString[20];
-    for (size_t index = 0; index < theCount; index++) {
+    for (size_t index = metaSize; index < theCount; index++) {
         databaseInuse->readBlock(index, theBlock);
         strncpy(theString, theBlock.payload, 20);
         theString[19] = 0;

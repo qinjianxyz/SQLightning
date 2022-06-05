@@ -15,7 +15,7 @@ Storage::~Storage() {}
 StatusResult Storage::each(const BlockVisitor &aVisitor) {
     size_t theCount = getBlockCount();
     Block theBlock;
-    for(size_t i = 0; i < theCount; i++) {
+    for(size_t i = metaSize; i < theCount; i++) {
         if(readBlock(i, theBlock)) {
             if(!aVisitor(theBlock, i)) {
                 break;
@@ -28,7 +28,7 @@ StatusResult Storage::each(const BlockVisitor &aVisitor) {
 StatusResult Storage::pushPayload(Block& aBlock, const Storable& aStorable) {
     std::stringstream ss;
     aStorable.encode(ss);
-    memcpy(aBlock.payload, ss.str().c_str(), kPayloadSize);
+    memcpy(aBlock.payload, ss.str().c_str(), strlen(ss.str().c_str())+1);
     return StatusResult{};
 }
 
@@ -66,6 +66,14 @@ StatusResult Storage::readEntity(const size_t aBlockNum, Entity& anEntity) {
 }
 
 StatusResult Storage::readRow(const size_t aBlockNum, Row& aRow) {
+    // row cache
+    if (Config::useCache(CacheType::row)) {
+        if (rowCache.contains(aBlockNum)) {
+            aRow = rowCache.get(aBlockNum);
+            return StatusResult{};
+        }
+    }
+    
     Block theBlock;
     readBlock(aBlockNum, theBlock);
     if (static_cast<char>(BlockType::data_block) != theBlock.header.type) {
@@ -74,6 +82,11 @@ StatusResult Storage::readRow(const size_t aBlockNum, Row& aRow) {
     auto ss = pullPayload(theBlock);
     aRow.decode(ss);
     aRow.setRowNumber(aBlockNum); // set row number
+    
+    // row cache
+    if (Config::useCache(CacheType::row)) {
+        rowCache.put(aBlockNum, aRow);
+    }
     return StatusResult{};
 }
 
@@ -89,12 +102,19 @@ StatusResult Storage::readRowName(const size_t aBlockNum, std::string& aString) 
     return StatusResult{};
 }
 
-size_t Storage::writeNewRow(const Row& aRow) {
+size_t Storage::writeNewRow(Row& aRow) {
     stream->clear();
     size_t theBlockNum = findNextFreeBlock();
     Block theBlock(BlockType::data_block);
+    aRow.setRowNumber(theBlockNum); // set row number
+    
     pushPayload(theBlock, aRow);
     writeBlock(theBlockNum, theBlock);
+    
+    // row cache
+    if (Config::useCache(CacheType::row)) {
+        rowCache.put(theBlockNum, aRow);
+    }
     return theBlockNum;
 }
 
@@ -104,18 +124,19 @@ StatusResult Storage::writeExistingRow(const Row& aRow) {
     Block theBlock(BlockType::data_block);
     pushPayload(theBlock, aRow);
     writeBlock(theBlockNum, theBlock);
+    // row cache
+    if (Config::useCache(CacheType::row)) {
+        rowCache.put(theBlockNum, aRow);
+    }
     return StatusResult{};
 }
 
-StatusResult Storage::clearBlock(const size_t aBlockNum) {
-    StatusResult theRes;
-    Block theNewBlock;
-    theNewBlock.header.type = static_cast<char>(BlockType::free_block);
-    theNewBlock.payload[0] = '\0';
-    theRes = writeBlock(aBlockNum, theNewBlock);
-    if (!theRes) return theRes;
-    return theRes;
+StatusResult Storage::clearRow(const size_t aBlockNum) {
+    rowCache.del(aBlockNum);
+    clearBlock(aBlockNum);
+    return StatusResult{};
 }
+
 
 }
 

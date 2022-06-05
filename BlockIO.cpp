@@ -25,6 +25,20 @@ Block& Block::operator=(const Block &aCopy) {
     return *this;
 }
 
+IndexMetaBlock::IndexMetaBlock(BlockType aType) {
+    header.type = static_cast<char>(aType);
+}
+
+IndexMetaBlock::IndexMetaBlock(const Block &aCopy) {
+    *this=aCopy;
+}
+
+IndexMetaBlock& IndexMetaBlock::operator=(const Block &aCopy) {
+    std::memcpy(payload, aCopy.payload, kIndexMetaPayloadSize);
+    header=aCopy.header;
+    return *this;
+}
+
 BlockIO::BlockIO(std::string aPath, bool asNew) {
     if (asNew) {
         stream = std::make_unique<std::fstream>(aPath, openNew);
@@ -36,6 +50,9 @@ BlockIO::BlockIO(std::string aPath, bool asNew) {
 BlockIO::~BlockIO() {}
 
 StatusResult BlockIO::writeBlock(size_t aBlockNum, Block &aBlock) {
+    if (Config::useCache(CacheType::block)) {
+        blockCache.put(aBlockNum, aBlock);
+    }
     stream->clear();
     stream->seekg(aBlockNum * kBlockSize);
     stream->write((char*)&aBlock, kBlockSize);
@@ -45,11 +62,52 @@ StatusResult BlockIO::writeBlock(size_t aBlockNum, Block &aBlock) {
 }
 
 StatusResult BlockIO::readBlock(size_t aBlockNum, Block &aBlock) {
+    
+    if (Config::useCache(CacheType::block)) {
+        if (blockCache.contains(aBlockNum)) {
+            aBlock = blockCache.get(aBlockNum);
+            return StatusResult{};
+        }
+    }
     stream->clear();
     stream->seekg(aBlockNum * kBlockSize);
     stream->read((char*)&aBlock, kBlockSize);
     stream->clear();
-    return StatusResult{noError};
+    
+    if (Config::useCache(CacheType::block)) {
+        blockCache.put(aBlockNum, aBlock);
+    }
+    return StatusResult{};
+}
+
+StatusResult BlockIO::writeIndexMetaBlock(IndexMetaBlock &aBlock) {
+    stream->clear();
+    stream->seekg(1 * kBlockSize);
+    stream->write((char*)&aBlock, kIndexMetaBlockSize);
+    stream->flush();
+    stream->clear();
+    return StatusResult{};
+}
+
+StatusResult BlockIO::readIndexMetaBlock(IndexMetaBlock &aBlock) {
+    stream->clear();
+    stream->seekg(1 * kBlockSize);
+    stream->read((char*)&aBlock, kIndexMetaBlockSize);
+    stream->clear();
+    return StatusResult{};
+}
+
+StatusResult BlockIO::clearBlock(const size_t aBlockNum) {
+    StatusResult theRes;
+    Block theNewBlock;
+    theNewBlock.header.type = static_cast<char>(BlockType::free_block);
+    theNewBlock.payload[0] = '\0';
+    theRes = writeBlock(aBlockNum, theNewBlock);
+    if (!theRes) return theRes;
+    if (Config::useCache(CacheType::block)) {
+        blockCache.del(aBlockNum);
+    }
+    return theRes;
 }
 
 size_t BlockIO::getBlockCount()  {
@@ -65,15 +123,18 @@ size_t BlockIO::findNextFreeBlock() {
     if (0 == theCount) {
         return 0;
     }
-    Block aBlock;
-    size_t i;
-    for (i = 0; i < theCount; i++) {
-        readBlock(i, aBlock);
-        if (static_cast<char>(BlockType::free_block) == aBlock.header.type) {
-            break;
+    if (Config::useFreeBlock()) {
+        Block aBlock;
+        size_t i;
+        for (i = metaSize; i < theCount; i++) {
+            readBlock(i, aBlock);
+            if (static_cast<char>(BlockType::free_block) == aBlock.header.type) {
+                break;
+            }
         }
+        return i; // end of file
     }
-    return i; // end of file
+    return theCount;
 }
 
 }
