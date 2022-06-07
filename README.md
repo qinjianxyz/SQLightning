@@ -28,6 +28,8 @@ SELECT * from Users where age>20 AND zipcode=92100 ORDER BY last_name;<br>
 select first_name, last_name, age from Users order by last_name where age>60;<br>
 UPDATE Users SET "zipcode" = 92127 WHERE zipcode>92100;<br>
 DELETE FROM Users WHERE zipcode>92000;<br>
+ALTER TABLE Books ADD  pub_year int;<br>
+  ALTER TABLE Books DROP subtitle;<br>
 DROP TABLE Users;<br>
 SHOW TABLES;<br>
 SHOW DATABASES;<br>
