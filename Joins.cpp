@@ -7,9 +7,9 @@
 
 #include "Joins.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 const std::set<Keywords> Join::gJoinTypes = {
-    ECE141::Keywords::cross_kw, ECE141::Keywords::full_kw, ECE141::Keywords::inner_kw,
-    ECE141::Keywords::left_kw,  ECE141::Keywords::right_kw
+    SQLightning::Keywords::cross_kw, SQLightning::Keywords::full_kw, SQLightning::Keywords::inner_kw,
+    SQLightning::Keywords::left_kw,  SQLightning::Keywords::right_kw
 };
 }

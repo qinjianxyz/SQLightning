@@ -6,7 +6,7 @@
 
 #include "TypedStream.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 	StatusResult StreamEncoder::setStream(std::ostream* aStream) {
 		if (!aStream) {
 			return StatusResult{ streamExpected };

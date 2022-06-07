@@ -6,10 +6,48 @@
 
 #include "SQLStatement.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
+
+StatusResult UpdateTableStatement::parse(Tokenizer &aTokenizer) {
+    
+    // parse table name
+    aTokenizer.next(2);
+    tableName = aTokenizer.current().data;
+    aTokenizer.next();
+    
+    // parse action
+    if (aTokenizer.current().keyword == Keywords::drop_kw) {
+        // change type
+        add = false;
+        aTokenizer.next();
+        // parse field name
+        field = aTokenizer.current().data;
+    } else {
+        // add case
+        if (aTokenizer.current().keyword != Keywords::add_kw) {
+            return StatusResult{ unexpectedKeyword };
+        }
+        
+        // move on
+        aTokenizer.next();
+        
+        // parse field name
+        field = aTokenizer.current().data;
+        aTokenizer.next();
+        
+        // parse type and size
+        if (aTokenizer.current().type != TokenType::keyword) {
+            return StatusResult{ illegalIdentifier };
+        }
+        type = Helpers::keywordToDatatype(aTokenizer.current().keyword);
+    }
+    aTokenizer.skipTo(";");
+    aTokenizer.next();
+    return StatusResult{};
+}
+
 
 StatusResult InsertTableStatement::parse(Tokenizer &aTokenizer) {
-    
     // parse table name
     aTokenizer.next(2);
     tableName = aTokenizer.current().data;
@@ -506,6 +544,13 @@ StatusResult DeleteRowsStatement::run(std::ostream& aStream) const {
     return db->deleteRows(theQuery);
 }
 
+StatusResult UpdateTableStatement::run(std::ostream& aStream) const {
+    if (!db) {
+        return StatusResult(Errors::noDatabaseSpecified);
+    }
+    return db->changeEntity(tableName, add, field, type, size);
+}
+
 StatusResult ShowIndexesStatement::run(std::ostream& aStream) const {
     if (!db) {
         return StatusResult(Errors::noDatabaseSpecified);
@@ -522,6 +567,10 @@ StatusResult ShowTableIndexStatement::run(std::ostream& aStream) const {
 
 bool CreateTableStatement::recognize(Tokenizer& aTokenizer) {
     return Helpers::isEqualCmd(aTokenizer, { Keywords::create_kw, Keywords::table_kw, Keywords::unknown_kw });
+}
+
+bool UpdateTableStatement::recognize(Tokenizer &aTokenizer) {
+    return Helpers::isEqualCmd(aTokenizer, { Keywords::alter_kw, Keywords::table_kw, Keywords::unknown_kw });
 }
 
 bool DropTableStatement::recognize(Tokenizer& aTokenizer) {

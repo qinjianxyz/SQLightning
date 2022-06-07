@@ -13,7 +13,7 @@
 #include "Filters.hpp"
 #include "Joins.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 /**
  The query class contains all information about a query from the select statement
  */

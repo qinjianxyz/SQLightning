@@ -6,7 +6,7 @@
 
 #include "BlockIO.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 const auto openExisting = std::ios::in | std::ios::out | std::ios::binary;
 const auto openNew = std::ios::in | std::ios::out | std::ios::binary | std::ios::trunc;

@@ -19,7 +19,7 @@
 #include "Storable.hpp"
 #include "TypedStream.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The Row class contains information about a single row stored in the database
@@ -35,7 +35,7 @@ public:
     StatusResult        setTableName(const std::string& aName);
     StatusResult        setRowNumber(size_t aNum);
     StatusResult        removeKey(const std::string& aKey);
-
+    
     size_t              getNum() const;
     KeyValues&          getData() {return data;}
     const KeyValues&    getConstData() const { return data; }

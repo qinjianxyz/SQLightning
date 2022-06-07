@@ -10,7 +10,7 @@
 #include "TestAutomatic.hpp"
 #include "ScriptRunner.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 // initialize different command processors
 Application::Application(std::ostream &anOutput) : CmdProcessor(anOutput) {
@@ -48,8 +48,8 @@ CmdProcessor* Application::recognizes(Tokenizer &aTokenizer) {
 StatusResult Application::run(Statement* aStatement) {
     switch(aStatement->getType()) {
         case Keywords::quit_kw:
-            output << "DB::141 is shutting down\n";
-            return StatusResult(ECE141::userTerminated);
+            output << "SQLightning is shutting down\n";
+            return StatusResult(SQLightning::userTerminated);
             break;
         case Keywords::version_kw:
             output << "Version " << getVersion() << "\n";
@@ -72,7 +72,7 @@ StatusResult Application::runScript(std::string aFileName) {
     std::cout << thePath << std::endl;
     
     theFile.open(thePath);
-
+    
     if (!theFile) {
         theRes = StatusResult{ unknownFile };
         return theRes;

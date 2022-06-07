@@ -14,7 +14,7 @@
 #include "Database.hpp"
 #include "View.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Database;
 /**

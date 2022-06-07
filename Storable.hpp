@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "TypedStream.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The interface for all things storable in the database as a row

@@ -1,7 +1,7 @@
 //
 //  Config.hpp
-//
-//  Created by rick gessner on 2/27/22.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef Config_h
@@ -9,7 +9,7 @@
 #include <sstream>
 #include "Timer.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 enum class CacheType : int {block=0, row=1, view=2};
 
@@ -26,9 +26,9 @@ struct Config {
     static const std::string getStoragePath() {
         
         #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-            return "D:/Temp/ece141b"; // Windows
+            return "D:/Temp/sqlightning"; // Windows
         #elif __APPLE__ || defined __linux__ || defined __unix__
-            return "/tmp";  // MAC, UNIX, LINUX
+            return "/tmp";    // MAC, UNIX, LINUX
         #endif
         
     }
@@ -69,13 +69,15 @@ struct Config {
      Used in findNextFreeBlock() in BlockIO
      */
     static bool useFreeBlock() {
-        return false;
+        return true;
     }
     
     /**
      turning on this mode means blocks are retrieved using an index, otherwise by bruteforce
      */
-    static const bool indexMode;
+    static bool useIndex() {
+        return true;
+    }
     
 };
 

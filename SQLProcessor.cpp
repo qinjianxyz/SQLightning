@@ -6,7 +6,7 @@
 
 #include "SQLProcessor.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 
 SQLProcessor::SQLProcessor(std::ostream &anOutput, Application* anApp)
@@ -20,7 +20,8 @@ CmdProcessor* SQLProcessor::recognizes(Tokenizer &aTokenizer) {
         || DescribeStatement::recognize(aTokenizer) || ShowTablesStatement::recognize(aTokenizer)
         || InsertTableStatement::recognize(aTokenizer) || SelectStatement::recognize(aTokenizer)
         || UpdateRowsStatement::recognize(aTokenizer) || DeleteRowsStatement::recognize(aTokenizer)
-        || ShowIndexesStatement::recognize(aTokenizer) || ShowTableIndexStatement::recognize(aTokenizer)) {
+        || ShowIndexesStatement::recognize(aTokenizer) || ShowTableIndexStatement::recognize(aTokenizer)
+        || UpdateTableStatement::recognize(aTokenizer)) {
         return this;
     }
     return nullptr;
@@ -28,6 +29,9 @@ CmdProcessor* SQLProcessor::recognizes(Tokenizer &aTokenizer) {
 
 Statement* SQLProcessor::makeStatement(Tokenizer &aTokenizer, StatusResult &aResult) {
     Statement* aStatement = nullptr;
+    if (UpdateTableStatement::recognize(aTokenizer)) {
+       aStatement = new UpdateTableStatement(appRunning->getDatabaseInUse());
+    }
     if (CreateTableStatement::recognize(aTokenizer)) {
        aStatement = new CreateTableStatement(appRunning->getDatabaseInUse());
     }

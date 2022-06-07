@@ -13,7 +13,7 @@
 
 namespace fs = std::filesystem;
 
-namespace ECE141 {
+namespace SQLightning {
 
 using FileVisitor = std::function<bool(const std::string&)>;
 

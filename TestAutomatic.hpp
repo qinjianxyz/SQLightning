@@ -14,10 +14,8 @@
 #include <initializer_list>
 #include <algorithm>
 #include <random>
-#include <numeric>
 
 #include "Application.hpp"
-#include "AboutUs.hpp"
 #include "Errors.hpp"
 #include "Config.hpp"
 #include "FolderReader.hpp"
@@ -26,7 +24,7 @@
 #include "Timer.hpp"
 #include "ScriptRunner.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 using StringMap = std::map<std::string, std::string>;
 using CountList = std::vector<int>;
@@ -81,20 +79,20 @@ public:
     
     TestAutomatic(std::ostream &anOutput) : output(anOutput) {}
     
-    ~TestAutomatic() {std::cout << "Test Version 1.95\n";}
+    ~TestAutomatic() {std::cout << "Test Version 2.0\n";}
     
-    void showErrors(ECE141::StatusResult &aResult, std::ostream &anOutput) {
+    void showErrors(SQLightning::StatusResult &aResult, std::ostream &anOutput) {
         
-        static std::map<ECE141::Errors, std::string> theMessages = {
-            {ECE141::illegalIdentifier, "Illegal identifier"},
-            {ECE141::unknownIdentifier, "Unknown identifier"},
-            {ECE141::databaseExists, "Database exists"},
-            {ECE141::tableExists, "Table Exists"},
-            {ECE141::syntaxError, "Syntax Error"},
-            {ECE141::unknownCommand, "Unknown command"},
-            {ECE141::unknownDatabase,"Unknown database"},
-            {ECE141::unknownTable,   "Unknown table"},
-            {ECE141::unknownError,   "Unknown error"}
+        static std::map<SQLightning::Errors, std::string> theMessages = {
+            {SQLightning::illegalIdentifier, "Illegal identifier"},
+            {SQLightning::unknownIdentifier, "Unknown identifier"},
+            {SQLightning::databaseExists, "Database exists"},
+            {SQLightning::tableExists, "Table Exists"},
+            {SQLightning::syntaxError, "Syntax Error"},
+            {SQLightning::unknownCommand, "Unknown command"},
+            {SQLightning::unknownDatabase,"Unknown database"},
+            {SQLightning::unknownTable,   "Unknown table"},
+            {SQLightning::unknownError,   "Unknown error"}
         };
         
         std::string theMessage="Unknown Error";
@@ -134,22 +132,16 @@ public:
         anOutput << " id int NOT NULL auto_increment primary key,";
         anOutput << " title varchar(25) NOT NULL,";
         anOutput << " subtitle varchar(25),";
+        anOutput << " isbn varchar(10),";
         anOutput << " user_id int);\n";
     }
     
     bool doCompileTest() {
-        AboutUs theAbout;
-        auto theCount=theAbout.getTeamSize();
-        std::vector<std::string> theNames;
-        for(size_t i=0;i<theCount;i++) {
-            if(auto theName=theAbout.getName(i))
-                theNames.push_back(*theName);
-        }
-        return theNames.size()>0;
+        return true;
     }
     
     StatusResult doScriptTest(std::istream &anInput, std::ostream &anOutput) {
-        ECE141::Application theApp(anOutput);
+        SQLightning::Application theApp(anOutput);
         ScriptRunner        theRunner(theApp);
         return theRunner.run(anInput, anOutput);
     }
@@ -168,8 +160,8 @@ public:
         if(theResult) {
             const char* theLines[]={
                 theInput.c_str(),
-                "Version 0.9", "Help system available",
-                "DB::141 is shutting down"
+                "Version 1.0", "Help system available",
+                "SQLightning is shutting down"
             };
             
             std::stringstream theStream(temp);
@@ -201,6 +193,7 @@ public:
         static KWList dumpDB{Keywords::dump_kw,Keywords::database_kw};
         static KWList dropDB{Keywords::drop_kw,Keywords::database_kw};
         static KWList createTable{Keywords::create_kw,Keywords::table_kw};
+        static KWList alterTable{Keywords::alter_kw,Keywords::table_kw};
         static KWList showTables{Keywords::show_kw,Keywords::tables_kw};
         static KWList showIndex{Keywords::show_kw,Keywords::index_kw};
         static KWList showIndexes{Keywords::show_kw,Keywords::indexes_kw};
@@ -310,6 +303,12 @@ public:
                         theValue=std::stoi(theToken.data);
                         aResults.push_back({Commands::delet,theValue});
                         theSeq.clear().skipPast(')');
+                    }
+                }
+                else if(theSeq.clear().nextIs(alterTable)) {
+                    if(theSeq.skipPast(';').nextIs({Keywords::query_kw}).skip(2)) {
+                        theSeq.getNumber(theValue).skip(7);
+                        aResults.push_back({Commands::alter,theValue});
                     }
                 }
                 else theTokenizer.next(); //skip...
@@ -484,9 +483,11 @@ public:
         anOut << ";\n";
     }
     
-    void insertFakeUsers(std::ostream &anOut, size_t aGroupSize,size_t aGroupCount=1) {
+    void insertFakeUsers(std::ostream &anOut,
+                         size_t aGroupSize,
+                         size_t aGroupCount=1) {
         
-        for(size_t theCount=0; theCount<aGroupCount; theCount++) {
+        for(size_t theCount=0;theCount<aGroupCount;theCount++) {
             anOut<<"INSERT INTO Users (first_name, last_name, age, zipcode) VALUES ";
             const char* thePrefix="";
             for(size_t theSize=0;theSize<aGroupSize;theSize++) {
@@ -504,23 +505,23 @@ public:
     void insertBooks(std::ostream &anOut,
                      size_t anOffset, size_t aLimit) {
         static const char* kBooks[]={
-            " (\"The Green Mile\",4)",
-            " (\"The Stand\",4)",
-            " (\"Misery\",4)",
-            " (\"11/22/63\",4)",
-            " (\"The Institute\",4)",
-            " (\"Sorcerer\",1)",
-            " (\"Wintersmith\",1)",
-            " (\"Mort\",1)",
-            " (\"Thud\",1)",
-            " (\"Time Police\",3)",
-            " (\"The Mechanical\",2)",
-            " (\"The Liberation\",2)",
-            " (\"The Rising\",2)",
-            " (\"Exhalation\",5)",
+            " (\"The Green Mile\",4, \"C123-932L\")",
+            " (\"The Stand\",4, \"RV36-M11B\")",
+            " (\"Misery\",4, \"VI77-21K3\")",
+            " (\"11/22/63\",4, \"PA45-M023\")",
+            " (\"The Institute\",4, \"F94K-916M\")",
+            " (\"Sorcerer\",1, \"E598-B81S\")",
+            " (\"Wintersmith\",1, \"W84S-P70R\")",
+            " (\"Mort\",1, \"KEJ5-27D3\")",
+            " (\"Thud\",1, \"YAL4-J001\")",
+            " (\"Time Police\",3, \"EK50-J001\")",
+            " (\"The Mechanical\",2, \"ULRR-1320\")",
+            " (\"The Liberation\",2, \"ZK95-9413\")",
+            " (\"The Rising\",2, \"ECC7-6BB0\")",
+            " (\"Exhalation\",5, \"18MQ-Q414\")",
         };
         
-        anOut<<"INSERT INTO Books (title, user_id)";
+        anOut<<"INSERT INTO Books (title, user_id, isbn)";
         
         size_t theSize=sizeof(kBooks)/sizeof(char*);
         size_t theLimit=std::min(theSize, anOffset+aLimit);
@@ -818,9 +819,9 @@ public:
         addUsersTable(theStream1);
         insertUsers(theStream1,0,5);
         
-        theStream1 << "show tables;\n";
+        theStream1 << "show tables\n";
         theStream1 << "drop table Users;\n";
-        theStream1 << "show tables;\n";
+        theStream1 << "show tables\n";
         theStream1 << "drop database " << theDBName1 << ";\n";
         
         std::string temp(theStream1.str());
@@ -1048,7 +1049,8 @@ public:
             }
             
             if(theResult) {
-                double theAvgTime2=std::accumulate(theTimes.begin(), theTimes.end(), 0.0) / theTimes.size();
+                double theAvgTime2=std::accumulate(
+                                                   theTimes.begin(), theTimes.end(), 0.0) / theTimes.size();
                 return theAvgTime2<theAvgTime;
             }
         }
@@ -1068,6 +1070,99 @@ public:
         return doCacheTest(CacheType::view, 30);
     }
     
+    bool doAddColumnTest() {
+        std::stringstream theStream1;
+        theStream1 << "create database finalA;\n";
+        theStream1 << "create database finalB;\n";
+        theStream1 << "use finalA;\n";
+        
+        addBooksTable(theStream1);
+        insertBooks(theStream1,0,14);
+        theStream1 << "describe Books;\n";
+        theStream1 << "ALTER TABLE Books add pub_year int;\n";
+        
+        theStream1 << "use finalB;\n";
+        theStream1 << "drop database finalB;\n";
+        theStream1 << "use finalA;\n";
+        theStream1 << "UPDATE Books set pub_year=2022 where id<8;\n";
+        theStream1 << "describe Books;\n";
+        theStream1 << "select * from Books where id<8 order by title;\n";
+        theStream1 << "drop database finalA;\n";
+        theStream1 << "quit;\n";
+        
+        std::stringstream theInput(theStream1.str());
+        std::stringstream theOutput;
+        
+        bool theResult=doScriptTest(theInput,theOutput);
+        if(theResult) {
+            std::string tempStr=theOutput.str();
+            output << "output \n" << tempStr << "\n";
+            //std::cout << tempStr << "\n";
+            
+            Responses theResponses;
+            size_t theCount=analyzeOutput(theOutput,theResponses);
+            Expected theExpected({
+                {Commands::createDB,1},     {Commands::createDB,1},
+                {Commands::useDB,0},        {Commands::createTable,1},
+                {Commands::insert,14},      {Commands::describe,5},
+                {Commands::alter,14},       {Commands::useDB,0},
+                {Commands::dropDB,0},       {Commands::useDB,0},
+                {Commands::update,7},       {Commands::describe,6},
+                {Commands::select,7},       {Commands::dropDB,0},
+            });
+            if(!theCount || !(theExpected==theResponses)) {
+                theResult=false;
+            }
+        }
+        return theResult;
+    }
+    
+    bool doRemoveColumnTest() {
+        std::stringstream theStream1;
+        theStream1 << "create database finalA;\n";
+        theStream1 << "create database finalB;\n";
+        theStream1 << "use finalA;\n";
+        
+        addBooksTable(theStream1);
+        insertBooks(theStream1,0,14);
+        theStream1 << "describe Books;\n";
+        theStream1 << "ALTER TABLE Books drop subtitle;\n";
+        
+        theStream1 << "use finalB;\n";
+        theStream1 << "drop database finalB;\n";
+        theStream1 << "use finalA;\n";
+        theStream1 << "describe Books;\n";
+        theStream1 << "select * from Books where id<8 order by title;\n";
+        theStream1 << "drop database finalA;\n";
+        theStream1 << "quit;\n";
+        
+        std::stringstream theInput(theStream1.str());
+        std::stringstream theOutput;
+        
+        bool theResult=doScriptTest(theInput,theOutput);
+        if(theResult) {
+            std::string tempStr=theOutput.str();
+            output << "output \n" << tempStr << "\n";
+            //std::cout << tempStr << "\n";
+            
+            Responses theResponses;
+            size_t theCount=analyzeOutput(theOutput,theResponses);
+            Expected theExpected({
+                {Commands::createDB,1},     {Commands::createDB,1},
+                {Commands::useDB,0},        {Commands::createTable,1},
+                {Commands::insert,14},      {Commands::describe,5},
+                {Commands::alter,14},       {Commands::useDB,0},
+                {Commands::dropDB,0},       {Commands::useDB,0},
+                {Commands::describe,4},     {Commands::select,7},
+                {Commands::dropDB,0},
+            });
+            if(!theCount || !(theExpected==theResponses)) {
+                theResult=false;
+            }
+        }
+        return theResult;
+    }
+    
     bool doStressTest() {
         Timer theTimer;
         theTimer.reset();
@@ -1078,7 +1173,7 @@ public:
         theStream << "use " << theDBName << ";\n";
         
         addUsersTable(theStream);
-        insertFakeUsers(theStream, 1000, 10);
+        insertFakeUsers(theStream, 100, 10);
         
         theStream << "select * from Users;\n";
         theStream << "quit;\n";
@@ -1088,10 +1183,13 @@ public:
         bool theResult=doScriptTest(theInput,theOutput);
         
         size_t timeTaken = theTimer.elapsed();
+        
         std::cout << "Use Free Block: " << (Config::useFreeBlock() ? "TRUE" : "FALSE") << std::endl;
+        std::cout << "Use Index: " << (Config::useIndex() ? "TRUE" : "FALSE") << std::endl;
         std::cout << "Time Taken: " << (timeTaken / 60) << " mins and "<< (timeTaken % 60) << " secs;" << std::endl;
         return theResult;
     }
+    
 };
 
 }

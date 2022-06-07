@@ -18,7 +18,7 @@
 #include "Database.hpp"
 #include "Helpers.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The class is a general view for any output in the command line

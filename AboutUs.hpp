@@ -12,7 +12,7 @@
 #include <optional>
 #include <vector>
 
-namespace ECE141 {
+namespace SQLightning {
 
 using StringOpt = std::optional<std::string>;
 

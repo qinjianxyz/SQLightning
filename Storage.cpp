@@ -6,7 +6,7 @@
 
 #include "Storage.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 Storage::Storage(std::string aPath) : BlockIO(aPath, false) {}
 

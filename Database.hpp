@@ -33,7 +33,7 @@
 #include "IndexMeta.hpp"
 #include "Index.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  This class contains meta information for the database such as version entity map
@@ -55,6 +55,8 @@ public:
     Database(std::string aPath, std::ostream &anOutput);
     ~Database();
     
+    StatusResult    changeEntity(const std::string& aTableName, bool addField, const std::string& aFieldName,
+                                 const DataTypes aType = DataTypes::no_type, const size_t aSize = 0);
     StatusResult    createTable(const Entity& anEntity);
     StatusResult    describeTable(const std::string &aName);
     StatusResult    dropTable(const std::string &aName);

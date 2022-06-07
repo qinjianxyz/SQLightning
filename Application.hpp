@@ -25,7 +25,7 @@
 #include "FolderView.hpp"
 #include "Config.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class DBProcessor;
 class SQLProcessor;

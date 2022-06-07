@@ -28,7 +28,7 @@
 #include "TypedStream.hpp"
 
 
-namespace ECE141 {
+namespace SQLightning {
 
 using AttributeOpt = std::optional<Attribute>;
 using AttributeList = std::vector<Attribute>;
@@ -45,12 +45,13 @@ public:
     void                                setName(const std::string);
     std::string                         getName() const {return name;}
     std::vector<Attribute>              getAttributes() const {return attributes;}
-    Entity&                             addAttribute(const Attribute &anAttribute);
+    StatusResult                        addAttribute(const Attribute &anAttribute);
     AttributeOpt                        getAttribute(const std::string &aName) const;
     AttributeOpt                        getPrimaryKey() const;
     size_t                              getNextPrimaryKey();
     StatusResult                        addPrimaryKey(Row& aRow);
     StatusResult                        removeAttribute(const std::string& aName);
+    
     
     StatusResult                        encode(std::ostream& anOutput) const override;
     StatusResult                        decode(std::istream& anInput) override;

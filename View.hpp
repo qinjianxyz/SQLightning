@@ -11,7 +11,7 @@
 #include <iostream>
 #include "Errors.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  completely generic view, which you will subclass to show information

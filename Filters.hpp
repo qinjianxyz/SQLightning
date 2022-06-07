@@ -1,9 +1,7 @@
 //
 //  Filters.hpp
-//  RGAssignment5
-//
-//  Created by rick gessner on 4/4/21.
-//  Copyright © 2021 rick gessner. All rights reserved.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef Filters_h
@@ -24,7 +22,7 @@
 #include "Tokenizer.hpp"
 #include "BasicTypes.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Row;
 class Entity;

@@ -17,7 +17,7 @@
 #include "Tokenizer.hpp"
 #include "Helpers.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Statement;
 class DBProcessor;
@@ -42,6 +42,24 @@ protected:
 
 using EntityOpt = std::optional<Entity>;
 using AttributeOpt = std::optional<Attribute>;
+
+class UpdateTableStatement : public SQLStatement {
+public:
+    UpdateTableStatement(Database* aDatabase, Keywords aStatementType = Keywords::update_kw, std::string aName = ""
+                        , std::string aField = "", DataTypes aType = DataTypes::no_type) : SQLStatement(aDatabase, aStatementType, aName)
+                        , field(aField), type(aType), add(true), size(0) {}
+    
+    virtual ~UpdateTableStatement() {}
+    StatusResult parse(Tokenizer& aTokenizer) override;
+    StatusResult run(std::ostream& aStream) const override;
+    static bool  recognize(Tokenizer& aTokenizer);
+
+    bool        add; // true means add, false means delete
+    size_t      size;
+    std::string field;
+    DataTypes   type;
+};
+
 
 class CreateTableStatement : public SQLStatement {
 public:

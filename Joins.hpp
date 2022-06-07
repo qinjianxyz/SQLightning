@@ -1,8 +1,7 @@
 //
-//  Join.hpp
-//  RGAssignment8
-//
-//  Created by rick gessner on 5/21/21.
+//  Joins.hpp
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef Join_h
@@ -15,7 +14,7 @@
 #include "keywords.hpp"
 #include "Row.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Join {
 public:

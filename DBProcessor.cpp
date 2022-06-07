@@ -7,7 +7,7 @@
 #include "DBProcessor.hpp"
 
 
-namespace ECE141 {
+namespace SQLightning {
 
 using StmtFactory = Statement* (*)(DBProcessor *aProc, Tokenizer &aTokenize);
 

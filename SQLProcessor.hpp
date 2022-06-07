@@ -13,7 +13,7 @@
 #include "Tokenizer.hpp"
 #include "SQLStatement.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Statement;
 class DBProcessor;

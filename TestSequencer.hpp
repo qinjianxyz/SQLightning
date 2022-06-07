@@ -11,7 +11,7 @@
 #include "keywords.hpp"
 #include <initializer_list>
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  A sequencer created for testing purposes

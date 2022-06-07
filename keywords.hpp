@@ -13,7 +13,7 @@
 #include <map>
 #include "Errors.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 
 //This enum defines each of the keywords we need to handle across our multiple languages...

@@ -6,7 +6,7 @@
 
 #include "IndexMeta.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 StatusResult IndexMeta::encode(std::ostream& anOutput) const {
     StatusResult theRes;
     StreamEncoder anEncoder(&anOutput);
@@ -106,13 +106,13 @@ StatusResult IndexMeta::isContainField(const std::string aTableName, const std::
 /**
  Implementation is unclear after converting index to a vector
  
-StatusResult IndexMeta::updateFieldIndex(const std::string aTableName, const std::string aFieldName, const int aBlockNumber) {
-    StatusResult theRes;
-    theRes = isContainField(aTableName, aFieldName);
-    if (!theRes) return theRes;
-    theTableIndexMap[aTableName][aFieldName] = aBlockNumber;
-    return theRes;
-}
+ StatusResult IndexMeta::updateFieldIndex(const std::string aTableName, const std::string aFieldName, const int aBlockNumber) {
+ StatusResult theRes;
+ theRes = isContainField(aTableName, aFieldName);
+ if (!theRes) return theRes;
+ theTableIndexMap[aTableName][aFieldName] = aBlockNumber;
+ return theRes;
+ }
  */
 
 StatusResult IndexMeta::deleteFieldIndex(const std::string aTableName, const std::string aFieldName) {

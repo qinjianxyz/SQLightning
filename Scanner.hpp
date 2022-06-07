@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace ECE141 {
+namespace SQLightning {
 
 using parseCallback = bool(char aChar);
 

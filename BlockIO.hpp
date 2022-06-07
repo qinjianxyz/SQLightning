@@ -19,7 +19,7 @@
 #include "Config.hpp"
 #include "LRUCache.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The class contains customed defined block types

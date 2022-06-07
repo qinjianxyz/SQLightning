@@ -15,7 +15,7 @@
 #include "Statement.hpp"
 #include "Tokenizer.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  This class is the interface of all command processors

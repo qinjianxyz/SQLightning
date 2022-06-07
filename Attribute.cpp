@@ -6,7 +6,7 @@
 
 #include "Attribute.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 Attribute::Attribute(DataTypes aType)
 : type(aType),size(0),autoIncrement(0),primary(0),nullable(1) {}
@@ -57,7 +57,7 @@ StatusResult Attribute::decode(StreamDecoder& aDecoder) {
     size_t autoIncrementNum;
     size_t primaryNum;
     size_t nullableNum;
-
+    
     aDecoder.decode(nameStr)
         .decode(typeStr)
         .decode(sizeNum)

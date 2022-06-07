@@ -6,7 +6,7 @@
 
 #include "ParseHelper.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 // USE: gets properties following the type in an attribute decl...
 StatusResult ParseHelper::parseAttributeOptions(Attribute &anAttribute) {
@@ -133,20 +133,20 @@ StatusResult ParseHelper::parseValueList(StringList &aList) {
 
 //read a comma-sep list of key/value pairs...
 /*
-StatusResult ParseHelper::parseKeyValues(KeyValues &aList, Entity &anEntity) {
-    StatusResult theResult{noError};
-    while(theResult && tokenizer.more()) {
-        TokenSequencer thePhrase(tokenizer);
-        std::string theName;
-        int theValue{0};
-        if(thePhrase.hasId(theName).hasOp(Operators::equal_op).hasNumber(theValue)) {
-            tokenizer.next(3);
-            //Add code here to finish this...
-        }
-        theResult.error=syntaxError;
-    }
-    return theResult;
-}
+ StatusResult ParseHelper::parseKeyValues(KeyValues &aList, Entity &anEntity) {
+ StatusResult theResult{noError};
+ while(theResult && tokenizer.more()) {
+ TokenSequencer thePhrase(tokenizer);
+ std::string theName;
+ int theValue{0};
+ if(thePhrase.hasId(theName).hasOp(Operators::equal_op).hasNumber(theValue)) {
+ tokenizer.next(3);
+ //Add code here to finish this...
+ }
+ theResult.error=syntaxError;
+ }
+ return theResult;
+ }
  */
 
 }

@@ -1,8 +1,7 @@
 //
 //  Index.hpp
-//  RGAssignment3
-//
-//  Created by rick gessner on 4/2/21.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef Index_hpp
@@ -21,7 +20,7 @@
 #include "TypedStream.hpp"
 
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Index : public Storable {
 public:

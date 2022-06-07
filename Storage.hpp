@@ -27,7 +27,7 @@
 #include "Entity.hpp"
 #include "Storable.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Database;
 using BlockVisitor = std::function<bool(const Block&, size_t)>;

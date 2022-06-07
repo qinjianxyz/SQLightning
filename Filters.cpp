@@ -1,14 +1,13 @@
 //
 //  Filters.cpp
-//  Datatabase5
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
-//  Created by rick gessner on 3/5/21.
-//  Copyright © 2021 rick gessner. All rights reserved.
-//
+
 
 #include "Filters.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 using Comparator = bool (*)(const Value &aLHS, const Value &aRHS);
 

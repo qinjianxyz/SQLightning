@@ -1,6 +1,7 @@
 //
-//  TestManually.hpp
-//  Created by Rick Gessner
+//  TestManually.cpp
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef TestManually_h
@@ -11,19 +12,19 @@
 #include <sstream>
 
 
-void showError(ECE141::StatusResult &aResult, std::ostream &anOutput) {
+void showError(SQLightning::StatusResult &aResult, std::ostream &anOutput) {
     
-    static std::map<ECE141::Errors, std::string> theErrorMessages = {
-        {ECE141::illegalIdentifier, "Illegal identifier"},
-        {ECE141::unknownIdentifier, "Unknown identifier"},
-        {ECE141::databaseExists, "Database exists"},
-        {ECE141::tableExists, "Table Exists"},
-        {ECE141::syntaxError, "Syntax Error"},
-        {ECE141::unknownCommand, "Unknown command"},
-        {ECE141::unknownDatabase,"Unknown database"},
-        {ECE141::unknownTable,   "Unknown table"},
-        {ECE141::unknownError,   "Unknown error"},
-        {ECE141::databaseRemovalError, "Database removal error"}
+    static std::map<SQLightning::Errors, std::string> theErrorMessages = {
+        {SQLightning::illegalIdentifier, "Illegal identifier"},
+        {SQLightning::unknownIdentifier, "Unknown identifier"},
+        {SQLightning::databaseExists, "Database exists"},
+        {SQLightning::tableExists, "Table Exists"},
+        {SQLightning::syntaxError, "Syntax Error"},
+        {SQLightning::unknownCommand, "Unknown command"},
+        {SQLightning::unknownDatabase,"Unknown database"},
+        {SQLightning::unknownTable,   "Unknown table"},
+        {SQLightning::unknownError,   "Unknown error"},
+        {SQLightning::databaseRemovalError, "Database removal error"}
     };
     
     std::string theMessage="Unknown Error";
@@ -35,8 +36,8 @@ void showError(ECE141::StatusResult &aResult, std::ostream &anOutput) {
 
 
 bool doManualTesting() {
-    ECE141::Application   theApp(std::cout);
-    ECE141::StatusResult  theResult{};
+    SQLightning::Application   theApp(std::cout);
+    SQLightning::StatusResult  theResult{};
     
     std::string theUserInput;
     bool running=true;
@@ -46,7 +47,7 @@ bool doManualTesting() {
             if(theUserInput.length()) {
                 std::stringstream theStream(theUserInput);
                 theResult=theApp.handleInput(theStream);
-                if(theResult==ECE141::userTerminated) {
+                if(theResult==SQLightning::userTerminated) {
                     running=false;
                 }
                 else if(!theResult) {

@@ -13,7 +13,7 @@
 #include "BasicTypes.hpp"
 #include "Tokenizer.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class StreamEncoder {
 public:

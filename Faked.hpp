@@ -1,8 +1,7 @@
 //
 //  Faked.hpp
-//  RGAssignment9
-//
-//  Created by rick gessner on 5/22/21.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef Faked_hpp
@@ -11,7 +10,7 @@
 #include <stdio.h>
 #include <string>
 
-namespace ECE141 {
+namespace SQLightning {
 
   struct Fake {
     Fake();

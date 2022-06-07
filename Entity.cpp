@@ -6,7 +6,7 @@
 
 #include "Entity.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 Entity::Entity(std::string aName) : name(aName), autoincr(0) {}
 
@@ -44,11 +44,11 @@ void Entity::setName(std::string aName) {
     name = aName;
 }
 
-Entity& Entity::addAttribute(const Attribute &anAttribute) {
+StatusResult Entity::addAttribute(const Attribute &anAttribute) {
     if(!getAttribute(anAttribute.getName())) {
         attributes.push_back(anAttribute);
     }
-    return *this;
+    return StatusResult{};
 }
 
 AttributeOpt Entity::getAttribute(const std::string &aName) const {
@@ -158,25 +158,25 @@ StatusResult Entity::isValidDatatype(const RowCollection& rows) const {
             AttributeOpt theAttribute = getAttribute(it->first);
             DataTypes theType = theAttribute.value().getType();
             switch (theType) {
-            case DataTypes::int_type:
-                if (!Helpers::findPointinNum(theString, 0)) {
-                    return StatusResult{ keyValueMismatch };
-                }
-                break;
-            case DataTypes::varchar_type:
-                break;
-            case DataTypes::float_type:
-                if (!Helpers::findPointinNum(theString, 1)) {
-                    return StatusResult{ keyValueMismatch };
-                }
-                break;
-            case DataTypes::bool_type:
-                if (1 != theString.size() || ('1' != theString[0] && '0' != theString[0])) {
-                    return StatusResult{ keyValueMismatch };
-                }
-                break;
-            default:
-                break;
+                case DataTypes::int_type:
+                    if (!Helpers::findPointinNum(theString, 0)) {
+                        return StatusResult{ keyValueMismatch };
+                    }
+                    break;
+                case DataTypes::varchar_type:
+                    break;
+                case DataTypes::float_type:
+                    if (!Helpers::findPointinNum(theString, 1)) {
+                        return StatusResult{ keyValueMismatch };
+                    }
+                    break;
+                case DataTypes::bool_type:
+                    if (1 != theString.size() || ('1' != theString[0] && '0' != theString[0])) {
+                        return StatusResult{ keyValueMismatch };
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }

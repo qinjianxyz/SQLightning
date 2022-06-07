@@ -6,7 +6,7 @@
 
 #include "Row.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 Row::Row(size_t aRowNum) : rowNum(aRowNum) {}
 
@@ -48,7 +48,7 @@ StatusResult Row::setTableName(const std::string& aName) {
 
 StatusResult Row::removeKey(const std::string& aKey) {
     if (!data.count(aKey)) {
-        return StatusResult{ unknownAttribute };
+        return StatusResult{};
     }
     data.erase(aKey);
     return StatusResult{};

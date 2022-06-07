@@ -8,7 +8,7 @@
 #include "EntityView.hpp"
 #include <string>
 
-namespace ECE141 {
+namespace SQLightning {
 
 Database::Database(std::string aPath, std::ostream &anOutput)
 : Storage(aPath), path(aPath), output(anOutput) {
@@ -20,6 +20,66 @@ Database::Database(std::string aPath, std::ostream &anOutput)
 
 Database::~Database() {
     writeIndexMeta();
+}
+
+StatusResult Database::changeEntity(const std::string& aTableName, bool addField, const std::string& aFieldName, const DataTypes aType, const size_t aSize) {
+    
+    if (!tableExists(aTableName)) {
+        return StatusResult{ unknownTable };
+    }
+    
+    StatusResult theRes;
+    Timer theTimer = Config::getTimer();
+    Entity theEntity;
+    theRes = readEntity(meta.entityList[aTableName], theEntity);
+    if (!theRes) return theRes;
+    
+    Query theQuery;
+    theQuery.tableName = aTableName;
+    theQuery.columns.push_back("*");
+    RowCollection theRows;
+    theRes = selectRowsByIndex(theQuery, theRows, "id");
+    if (!theRes) return theRes;
+    
+    // delete
+    if (!addField) {
+        theRes = theEntity.removeAttribute(aFieldName); // remove field
+        if (!theRes) return theRes;
+        theRes = updateEntity(theEntity, meta.entityList[aTableName]); // persist in disk
+        
+        // modify these rows
+        for (auto& row : theRows) {
+            theRes = row->removeKey(aFieldName);
+            if (!theRes) return theRes;
+            theRes = writeExistingRow(*row);
+            if (!theRes) return theRes;
+        }
+    } else {
+        // create new Attribute
+        Attribute theNewAttribute;
+        theNewAttribute.setDataType(aType);
+        theNewAttribute.setName(aFieldName);
+        theNewAttribute.setSize(aSize);
+        theNewAttribute.setNullable(true);
+        theNewAttribute.setPrimaryKey(false);
+        theNewAttribute.setAutoIncrement(false);
+        
+        theRes = theEntity.addAttribute(theNewAttribute); // add attribtue
+        if (!theRes) return theRes;
+        theRes = updateEntity(theEntity, meta.entityList[aTableName]); // persist in disk
+        if (!theRes) return theRes;
+        // modify these rows
+        for (auto& row : theRows) {
+            theRes = row->set(aFieldName, Helpers::writeDefaultValueForDataType(aType));
+            if (!theRes) return theRes;
+            theRes = writeExistingRow(*row);
+            if (!theRes) return theRes;
+        }
+    }
+    
+    CommandView theView(output, Keywords::alter_kw, true, theRows.size(), theTimer.elapsed());
+    theView.show();
+    return theRes;
 }
 
 StatusResult Database::storeIndex(const std::string& aTableName, const std::string& aFieldName, const std::string& aKey, const int& aBlockNumber) {
@@ -166,7 +226,7 @@ StatusResult Database::updateRows(const Query& aQuery, const KeyValues& aMap) {
     
     RowCollection theRows;
     // select rows
-    if (Config::indexMode) {
+    if (Config::useIndex()) {
         theRes = selectRowsByIndex(aQuery, theRows, "id");
     } else {
         theRes = selectRowsByBruteForce(aQuery, theRows);
@@ -181,12 +241,12 @@ StatusResult Database::updateRows(const Query& aQuery, const KeyValues& aMap) {
     // wirte new values (stored in aMap) into theRows, and change to true datatype according to entity
     theRes = updateRowsContent(aQuery, aMap, theRows);
     if (!theRes) return theRes;
-
+    
     // write rows to storage
     for (auto& row : theRows) {
         writeExistingRow(*row);
     }
-
+    
     theSuccessFlag = true;
     CommandView theView(output, Keywords::update_kw, theSuccessFlag, theRows.size(), theTimer.elapsed());
     theView.show();
@@ -205,7 +265,7 @@ StatusResult Database::deleteRows(const Query& aQuery) {
     
     RowCollection theRows;
     // select rows
-    if (Config::indexMode) {
+    if (Config::useIndex()) {
         theRes = selectRowsByIndex(aQuery, theRows, "id");
     } else {
         theRes = selectRowsByBruteForce(aQuery, theRows);
@@ -261,7 +321,7 @@ StatusResult Database::joinTables(const Query &aQuery, RowCollection &rows) {
     theSecondQuery.columns.push_back("*");
     theRes = selectRowsByBruteForce(theSecondQuery, theSecondRowCollection);
     if (!theRes) return theRes;
-
+    
     // right join
     if (Keywords::right_kw == aQuery.joins.joinType) {
         rows.swap(theSecondRowCollection);
@@ -279,13 +339,13 @@ StatusResult Database::joinEntity(const Query& aQuery, Entity& anEntity) {
     Entity theSecondaryEntity;
     theRes = readEntity(meta.entityList[aQuery.joins.secondaryTable], theSecondaryEntity);
     if (!theRes) return theRes;
-
+    
     // add original attributes to set
     std::set<std::string> attributeSet;
     for (auto& attri : anEntity.getAttributes()) {
         attributeSet.insert(attri.getName());
     }
-
+    
     // iterate all attributes in secondary table
     for (auto& attri : theSecondaryEntity.getAttributes()) {
         std::string theKey = attri.getName();
@@ -316,13 +376,13 @@ StatusResult Database::showQuery(const Query& aQuery) {
     bool theSuccessFlag = false;
     
     RowCollection theRows;
-    if (Config::indexMode) {
+    if (Config::useIndex()) {
         theRes = selectRowsByIndex(aQuery, theRows, "id");
     } else {
         theRes = selectRowsByBruteForce(aQuery, theRows);
     }
     if (!theRes) return theRes;
-
+    
     // read entity
     Entity theEntity;
     theRes = readEntity(meta.entityList[aQuery.tableName], theEntity);
@@ -339,7 +399,7 @@ StatusResult Database::showQuery(const Query& aQuery) {
         theRes = joinEntity(aQuery, theEntity);
         if (!theRes) return theRes;
     }
-
+    
     // order by
     theRes = orderRows(aQuery, theRows);
     if (!theRes) return theRes;
@@ -398,7 +458,7 @@ StatusResult Database::writeJoinedRow(const Join& aJoin, std::shared_ptr<Row>& a
     StatusResult theRes;
     // if this is the matched column
     if (aPair.first == aJoin.rhs) return theRes;
-
+    
     std::string theKey = aPair.first;
     if (!aRow->getConstData().count(theKey)) {
         aRow->set(theKey, aPair.second);
@@ -521,17 +581,17 @@ StatusResult Database::showTableIndex(const std::string& aTableName, const std::
             theTotalSize++;
         }
     }
-     
+    
     theView.addData(theData);
     theView.show();
-     
+    
     
     /*
-    RowCollection theRows;
-    Query theQuery;
-    theQuery.tableName = aTableName;
-    theQuery.columns.push_back("*");
-    theRes = selectRowsByIndex(theQuery, theRows, "id");
+     RowCollection theRows;
+     Query theQuery;
+     theQuery.tableName = aTableName;
+     theQuery.columns.push_back("*");
+     theRes = selectRowsByIndex(theQuery, theRows, "id");
      */
     
     if (!theRes) return theRes;
@@ -552,7 +612,7 @@ StatusResult Database::updateRowsContent(const Query& aQuery, const KeyValues& a
     Entity theEntity;
     theRes = readEntity(meta.entityList[aQuery.tableName], theEntity);
     if (!theRes) return theRes;
-
+    
     // write true datatype in each row
     std::set<std::string> columns;
     for (auto& item : aMap) {
@@ -560,7 +620,7 @@ StatusResult Database::updateRowsContent(const Query& aQuery, const KeyValues& a
     }
     theRes = theEntity.writeDatatype(theRows, columns);
     if (!theRes) return theRes;
-
+    
     return theRes;
 }
 
@@ -601,7 +661,7 @@ StatusResult Database::dropTable(const std::string &aName) {
     std::vector<size_t> deleteBlockNum;
     // add entity blocks
     deleteBlockNum.push_back(meta.entityList[aName]);
-
+    
     // add data blocks
     each([&](const Block &aBlock, size_t aBlockNum) {
         std::string theName = "";
@@ -626,7 +686,7 @@ StatusResult Database::dropTable(const std::string &aName) {
         theRes = clearBlock(index);
         if (!theRes) return theRes;
     }
-
+    
     // delete data blocks
     for (auto& blockNum : deleteBlockNum) {
         theRes = clearBlock(blockNum);
@@ -697,7 +757,9 @@ StatusResult Database::insertRow(const std::string& theTableName, const std::vec
         theRowNumber = writeNewRow(*row);
         
         // index
-        storeIndex(theTableName, thePrimaryKey, Helpers::valueToString(row->getValue(thePrimaryKey).value()), static_cast<int>(theRowNumber));
+        if (Config::useIndex()) {
+            storeIndex(theTableName, thePrimaryKey, Helpers::valueToString(row->getValue(thePrimaryKey).value()), static_cast<int>(theRowNumber));
+        }
         
         theCount++;
     }
@@ -705,7 +767,7 @@ StatusResult Database::insertRow(const std::string& theTableName, const std::vec
     theSuccessFlag = true;
     CommandView theView(output, Keywords::insert_kw, theSuccessFlag, theCount, theTimer.elapsed());
     theView.show();
-
+    
     return theRes;
 }
 
@@ -768,20 +830,20 @@ StatusResult Database::limitRows(const Query& aQuery, RowCollection& rows) {
         return theRes;
     }
     size_t end, offset;
-
+    
     switch (aQuery.limits.size())
     {
-    case 1: // "limit 3" means length is 3
-        offset = 0;
-        end = aQuery.limits[0];
-        break;
-    case 2: // "limit 3, 5" means offset is 3 and length is 5
-        end = aQuery.limits[0] + aQuery.limits[1];
-        offset = aQuery.limits[0];
-        break;
-    default:
-        return theRes = StatusResult{ invalidCommand };
-        break;
+        case 1: // "limit 3" means length is 3
+            offset = 0;
+            end = aQuery.limits[0];
+            break;
+        case 2: // "limit 3, 5" means offset is 3 and length is 5
+            end = aQuery.limits[0] + aQuery.limits[1];
+            offset = aQuery.limits[0];
+            break;
+        default:
+            return theRes = StatusResult{ invalidCommand };
+            break;
     }
     // keep offset and end in valid range
     offset = std::min(offset, rows.size());

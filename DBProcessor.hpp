@@ -22,7 +22,7 @@
 
 
 
-namespace ECE141 {
+namespace SQLightning {
 
 class Application;
 

@@ -24,7 +24,7 @@
 /**
  The attribute class contains information about a field in the sql database
  */
-namespace ECE141 {
+namespace SQLightning {
 
 class Attribute : public Storable {
 protected:

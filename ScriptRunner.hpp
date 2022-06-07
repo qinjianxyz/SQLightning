@@ -1,8 +1,7 @@
 //
 //  ScriptRunner.hpp
-//  RG_PA9
-//
-//  Created by rick gessner on 5/26/22.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef ScriptRunner_h
@@ -12,7 +11,7 @@
 #include <sstream>
 #include "Application.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 class ScriptRunner {
 public:

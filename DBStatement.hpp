@@ -9,7 +9,7 @@
 
 #include "Statement.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The DBStatement class contains information about a database operation from the command line

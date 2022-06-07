@@ -7,7 +7,7 @@
 #include "Tokenizer.hpp"
 #include "Helpers.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 
 bool isWhitespace(char aChar) {
@@ -83,6 +83,17 @@ bool Tokenizer::skipTo(Keywords aTarget) {
     while (more()) {
         Token &theToken=current();
         if(TokenType::keyword==theToken.type && aTarget==theToken.keyword) {
+            return true;
+        }
+        next();
+    }
+    return false;
+}
+
+bool Tokenizer::skipTo(std::string aChar) {
+    while (more()) {
+        Token &theToken = current();
+        if(theToken.data == aChar) {
             return true;
         }
         next();

@@ -7,7 +7,7 @@
 #ifndef Errors_h
 #define Errors_h
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The Errors class defines the errors we can face during the operaton

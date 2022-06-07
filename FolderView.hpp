@@ -12,7 +12,7 @@
 #include "View.hpp"
 #include <iomanip>
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The class shows information about a folder in the command line

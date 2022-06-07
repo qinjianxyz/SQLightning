@@ -13,7 +13,7 @@
 #include <map>
 #include <optional>
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The class contains customed designed data types

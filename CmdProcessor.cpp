@@ -6,7 +6,7 @@
 
 #include "CmdProcessor.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 CmdProcessor::CmdProcessor(std::ostream &anOutput)
 : output(anOutput){

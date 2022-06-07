@@ -12,7 +12,7 @@
 #include <iostream>
 #include <string>
 
-namespace ECE141 {
+namespace SQLightning {
 
 /**
  The base class for all statement in the database that conveys information about a specific operation

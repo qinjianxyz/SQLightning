@@ -11,7 +11,7 @@
 #include "keywords.hpp"
 #include "Tokenizer.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 
 /**
@@ -80,86 +80,86 @@ static std::map<std::string,  Keywords> gDictionary = {
     std::make_pair("and",       Keywords::and_kw),
     std::make_pair("as",        Keywords::as_kw),
     std::make_pair("asc",       Keywords::asc_kw),
-    std::make_pair("avg",       ECE141::Keywords::avg_kw),
+    std::make_pair("avg",       SQLightning::Keywords::avg_kw),
     std::make_pair("auto_increment", Keywords::auto_increment_kw),
-    std::make_pair("between",   ECE141::Keywords::between_kw),
-    std::make_pair("boolean",   ECE141::Keywords::boolean_kw),
-    std::make_pair("by",        ECE141::Keywords::by_kw),
-    std::make_pair("change",    ECE141::Keywords::change_kw),
-    std::make_pair("changed",    ECE141::Keywords::changed_kw),
-    std::make_pair("char",      ECE141::Keywords::char_kw),
-    std::make_pair("column",    ECE141::Keywords::column_kw),
-    std::make_pair("count",     ECE141::Keywords::count_kw),
-    std::make_pair("create",    ECE141::Keywords::create_kw),
-    std::make_pair("cross",     ECE141::Keywords::cross_kw),
+    std::make_pair("between",   SQLightning::Keywords::between_kw),
+    std::make_pair("boolean",   SQLightning::Keywords::boolean_kw),
+    std::make_pair("by",        SQLightning::Keywords::by_kw),
+    std::make_pair("change",    SQLightning::Keywords::change_kw),
+    std::make_pair("changed",    SQLightning::Keywords::changed_kw),
+    std::make_pair("char",      SQLightning::Keywords::char_kw),
+    std::make_pair("column",    SQLightning::Keywords::column_kw),
+    std::make_pair("count",     SQLightning::Keywords::count_kw),
+    std::make_pair("create",    SQLightning::Keywords::create_kw),
+    std::make_pair("cross",     SQLightning::Keywords::cross_kw),
     std::make_pair("current_date",  Keywords::current_date_kw),
     std::make_pair("current_time",  Keywords::current_time_kw),
     std::make_pair("current_timestamp", Keywords::current_timestamp_kw),
-    std::make_pair("database",  ECE141::Keywords::database_kw),
-    std::make_pair("databases", ECE141::Keywords::databases_kw),
-    std::make_pair("datetime",  ECE141::Keywords::datetime_kw),
-    std::make_pair("decimal",   ECE141::Keywords::decimal_kw),
-    std::make_pair("desc",      ECE141::Keywords::desc_kw),
-    std::make_pair("delete",    ECE141::Keywords::delete_kw),
-    std::make_pair("describe",  ECE141::Keywords::describe_kw),
-    std::make_pair("distinct",  ECE141::Keywords::distinct_kw),
-    std::make_pair("double",    ECE141::Keywords::double_kw),
-    std::make_pair("drop",      ECE141::Keywords::drop_kw),
-    std::make_pair("dump",      ECE141::Keywords::dump_kw),
-    std::make_pair("enum",      ECE141::Keywords::enum_kw),
-    std::make_pair("explain",   ECE141::Keywords::explain_kw),
-    std::make_pair("false",     ECE141::Keywords::false_kw),
-    std::make_pair("float",     ECE141::Keywords::float_kw),
-    std::make_pair("foreign",   ECE141::Keywords::foreign_kw),
-    std::make_pair("from",      ECE141::Keywords::from_kw),
-    std::make_pair("full",      ECE141::Keywords::full_kw),
-    std::make_pair("group",     ECE141::Keywords::group_kw),
-    std::make_pair("help",      ECE141::Keywords::help_kw),
-    std::make_pair("in",        ECE141::Keywords::in_kw),
-    std::make_pair("index",     ECE141::Keywords::index_kw),
-    std::make_pair("indexes",   ECE141::Keywords::indexes_kw),
-    std::make_pair("inner",     ECE141::Keywords::inner_kw),
-    std::make_pair("insert",    ECE141::Keywords::insert_kw),
-    std::make_pair("int",       ECE141::Keywords::integer_kw),
-    std::make_pair("integer",   ECE141::Keywords::integer_kw),
-    std::make_pair("into",      ECE141::Keywords::into_kw),
-    std::make_pair("join",      ECE141::Keywords::join_kw),
-    std::make_pair("key",       ECE141::Keywords::key_kw),
-    std::make_pair("last",      ECE141::Keywords::last_kw),
-    std::make_pair("left",      ECE141::Keywords::left_kw),
-    std::make_pair("like",      ECE141::Keywords::like_kw),
-    std::make_pair("limit",     ECE141::Keywords::limit_kw),
-    std::make_pair("max",       ECE141::Keywords::max_kw),
-    std::make_pair("min",       ECE141::Keywords::min_kw),
-    std::make_pair("modify",    ECE141::Keywords::modify_kw),
-    std::make_pair("not",       ECE141::Keywords::not_kw),
-    std::make_pair("null",      ECE141::Keywords::null_kw),
-    std::make_pair("on",        ECE141::Keywords::on_kw),
-    std::make_pair("or",        ECE141::Keywords::or_kw),
-    std::make_pair("order",     ECE141::Keywords::order_kw),
-    std::make_pair("outer",     ECE141::Keywords::outer_kw),
-    std::make_pair("primary",   ECE141::Keywords::primary_kw),
-    std::make_pair("query",     ECE141::Keywords::query_kw),
-    std::make_pair("quit",      ECE141::Keywords::quit_kw),
-    std::make_pair("references", ECE141::Keywords::references_kw),
-    std::make_pair("right",     ECE141::Keywords::right_kw),
-    std::make_pair("rows",      ECE141::Keywords::rows_kw),
-    std::make_pair("select",    ECE141::Keywords::select_kw),
-    std::make_pair("self",      ECE141::Keywords::self_kw),
-    std::make_pair("set",       ECE141::Keywords::set_kw),
-    std::make_pair("show",      ECE141::Keywords::show_kw),
-    std::make_pair("sum",       ECE141::Keywords::sum_kw),
-    std::make_pair("table",     ECE141::Keywords::table_kw),
-    std::make_pair("tables",    ECE141::Keywords::tables_kw),
-    std::make_pair("true",      ECE141::Keywords::true_kw),
-    std::make_pair("unique",    ECE141::Keywords::unique_kw),
-    std::make_pair("update",    ECE141::Keywords::update_kw),
-    std::make_pair("use",       ECE141::Keywords::use_kw),
-    std::make_pair("values",    ECE141::Keywords::values_kw),
-    std::make_pair("varchar",   ECE141::Keywords::varchar_kw),
-    std::make_pair("version",   ECE141::Keywords::version_kw),
-    std::make_pair("where",     ECE141::Keywords::where_kw),
-    std::make_pair("run",       ECE141::Keywords::run_kw)
+    std::make_pair("database",  SQLightning::Keywords::database_kw),
+    std::make_pair("databases", SQLightning::Keywords::databases_kw),
+    std::make_pair("datetime",  SQLightning::Keywords::datetime_kw),
+    std::make_pair("decimal",   SQLightning::Keywords::decimal_kw),
+    std::make_pair("desc",      SQLightning::Keywords::desc_kw),
+    std::make_pair("delete",    SQLightning::Keywords::delete_kw),
+    std::make_pair("describe",  SQLightning::Keywords::describe_kw),
+    std::make_pair("distinct",  SQLightning::Keywords::distinct_kw),
+    std::make_pair("double",    SQLightning::Keywords::double_kw),
+    std::make_pair("drop",      SQLightning::Keywords::drop_kw),
+    std::make_pair("dump",      SQLightning::Keywords::dump_kw),
+    std::make_pair("enum",      SQLightning::Keywords::enum_kw),
+    std::make_pair("explain",   SQLightning::Keywords::explain_kw),
+    std::make_pair("false",     SQLightning::Keywords::false_kw),
+    std::make_pair("float",     SQLightning::Keywords::float_kw),
+    std::make_pair("foreign",   SQLightning::Keywords::foreign_kw),
+    std::make_pair("from",      SQLightning::Keywords::from_kw),
+    std::make_pair("full",      SQLightning::Keywords::full_kw),
+    std::make_pair("group",     SQLightning::Keywords::group_kw),
+    std::make_pair("help",      SQLightning::Keywords::help_kw),
+    std::make_pair("in",        SQLightning::Keywords::in_kw),
+    std::make_pair("index",     SQLightning::Keywords::index_kw),
+    std::make_pair("indexes",   SQLightning::Keywords::indexes_kw),
+    std::make_pair("inner",     SQLightning::Keywords::inner_kw),
+    std::make_pair("insert",    SQLightning::Keywords::insert_kw),
+    std::make_pair("int",       SQLightning::Keywords::integer_kw),
+    std::make_pair("integer",   SQLightning::Keywords::integer_kw),
+    std::make_pair("into",      SQLightning::Keywords::into_kw),
+    std::make_pair("join",      SQLightning::Keywords::join_kw),
+    std::make_pair("key",       SQLightning::Keywords::key_kw),
+    std::make_pair("last",      SQLightning::Keywords::last_kw),
+    std::make_pair("left",      SQLightning::Keywords::left_kw),
+    std::make_pair("like",      SQLightning::Keywords::like_kw),
+    std::make_pair("limit",     SQLightning::Keywords::limit_kw),
+    std::make_pair("max",       SQLightning::Keywords::max_kw),
+    std::make_pair("min",       SQLightning::Keywords::min_kw),
+    std::make_pair("modify",    SQLightning::Keywords::modify_kw),
+    std::make_pair("not",       SQLightning::Keywords::not_kw),
+    std::make_pair("null",      SQLightning::Keywords::null_kw),
+    std::make_pair("on",        SQLightning::Keywords::on_kw),
+    std::make_pair("or",        SQLightning::Keywords::or_kw),
+    std::make_pair("order",     SQLightning::Keywords::order_kw),
+    std::make_pair("outer",     SQLightning::Keywords::outer_kw),
+    std::make_pair("primary",   SQLightning::Keywords::primary_kw),
+    std::make_pair("query",     SQLightning::Keywords::query_kw),
+    std::make_pair("quit",      SQLightning::Keywords::quit_kw),
+    std::make_pair("references", SQLightning::Keywords::references_kw),
+    std::make_pair("right",     SQLightning::Keywords::right_kw),
+    std::make_pair("rows",      SQLightning::Keywords::rows_kw),
+    std::make_pair("select",    SQLightning::Keywords::select_kw),
+    std::make_pair("self",      SQLightning::Keywords::self_kw),
+    std::make_pair("set",       SQLightning::Keywords::set_kw),
+    std::make_pair("show",      SQLightning::Keywords::show_kw),
+    std::make_pair("sum",       SQLightning::Keywords::sum_kw),
+    std::make_pair("table",     SQLightning::Keywords::table_kw),
+    std::make_pair("tables",    SQLightning::Keywords::tables_kw),
+    std::make_pair("true",      SQLightning::Keywords::true_kw),
+    std::make_pair("unique",    SQLightning::Keywords::unique_kw),
+    std::make_pair("update",    SQLightning::Keywords::update_kw),
+    std::make_pair("use",       SQLightning::Keywords::use_kw),
+    std::make_pair("values",    SQLightning::Keywords::values_kw),
+    std::make_pair("varchar",   SQLightning::Keywords::varchar_kw),
+    std::make_pair("version",   SQLightning::Keywords::version_kw),
+    std::make_pair("where",     SQLightning::Keywords::where_kw),
+    std::make_pair("run",       SQLightning::Keywords::run_kw)
 };
 
 static std::map<Keywords, DataTypes> gKeywordTypes = {
@@ -269,6 +269,16 @@ public:
         ? gKeywordTypes[aKeyword] : DataTypes::no_type;
     }
     
+    static Value writeDefaultValueForDataType(DataTypes aType) {
+        switch (aType) {
+            case DataTypes::int_type     :  return 0;
+            case DataTypes::float_type   :  return 0.0;
+            case DataTypes::bool_type    :  return false;
+            case DataTypes::varchar_type :  return "";
+            default                      :  return 0;
+        }
+    }
+    
     static Operators toOperator(std::string aString) {
         auto theIter = gOperators.find(aString);
         if (theIter != gOperators.end()) {
@@ -344,7 +354,7 @@ public:
         }
         return theOutput;
     }
-
+    
     static StatusResult parseComma(Tokenizer& aTokenizer, std::vector<std::string>& strVec) {
         while (aTokenizer.more()) {
             strVec.push_back(aTokenizer.current().data);

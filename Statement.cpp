@@ -6,7 +6,7 @@
 
 #include "Statement.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 Statement::Statement(Keywords aStatementType, std::string anExtra) : extras(anExtra), stmtType(aStatementType){}
 

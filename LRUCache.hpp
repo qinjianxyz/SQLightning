@@ -1,8 +1,7 @@
 //
 //  LRUCache.hpp
-//  ece141b-cache
-//
-//  Created by Jian Qin on 6/2/22.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef LRUCache_hpp
@@ -12,7 +11,7 @@
 #include <list>
 #include <unordered_map>
 
-namespace ECE141 {
+namespace SQLightning {
 
 template<typename KeyT, typename ValueT>
 class LRUCache {

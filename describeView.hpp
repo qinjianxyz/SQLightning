@@ -1,8 +1,7 @@
 //
-//  describeView.hpp
-//  ece141b-pa8
-//
-//  Created by Jian Qin on 5/20/22.
+//  DescribeView.hpp
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef describeView_hpp
@@ -12,7 +11,7 @@
 #include "TabularView.hpp"
 #include "Entity.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 class DescribeView : public TabularView {
 public:
     DescribeView(std::ostream& anOutput) : TabularView(anOutput) {

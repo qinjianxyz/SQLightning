@@ -6,7 +6,7 @@
 
 #include "DBStatement.hpp"
 
-namespace ECE141
+namespace SQLightning
 {
 	DBStatement::DBStatement(Keywords aStatementType, std::string aStr) : Statement(aStatementType) {
 		databaseObj = aStr;

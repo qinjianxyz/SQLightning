@@ -11,7 +11,7 @@
 #include "keywords.hpp"
 #include "View.hpp"
 
-namespace  ECE141 {
+namespace  SQLightning {
 
 /**
  This class outputs the query information in the terminal

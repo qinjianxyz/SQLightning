@@ -15,7 +15,7 @@
 #include "Helpers.hpp"
 #include "Entity.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 //-------------------------------------------------
 

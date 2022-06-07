@@ -16,7 +16,7 @@
 #include "keywords.hpp"
 #include "Scanner.hpp"
 
-namespace ECE141 {
+namespace SQLightning {
 
 using parseCallback = bool(char aChar);
 
@@ -64,6 +64,7 @@ public:
     //these might consume a token...
     bool          skipTo(Keywords aKeyword);
     bool          skipTo(TokenType aTokenType);
+    bool          skipTo(std::string aChar);
     
     bool          skipIf(Keywords aKeyword);
     bool          skipIf(Operators anOperator);
