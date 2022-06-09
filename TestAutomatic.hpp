@@ -1,8 +1,7 @@
 //
 //  TestAutomatic.hpp
-//  RGAssignement1
-//
-//  Created by rick gessner on 2/26/21.
+//  Developed by Jian Qin & Xiaoqiang Qi
+//  Mentored by Rick Gessner
 //
 
 #ifndef TestAutomatic_h
