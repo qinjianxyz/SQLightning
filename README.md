@@ -8,7 +8,7 @@ step 1: make<br>
 step 2: ./sqlightning<br>
 
 ### Example Commands:<br>
-run <filename>;<br>
+run "filename";<br>
 help;<br>
 version;<br>
 quit;<br>
